@@ -8,27 +8,21 @@ case class Extractor(topic: String, statType: StatType, property: Option[String]
 object Extractor {
   def apply(extractor: String): Extractor = {
 
-    val pairs = extractor.split('.')
+    val pairs = extractor.split('.').toList
 
-    if (pairs.length == 1) {
-      Extractor(pairs(0), StatType.Count, None)
-    }
-    else if (pairs.length != 2) {
-      throw new Exception("Extractors must be in the format topic.property topic.property::count or topic.property::value")
-    }else {
-      val (property, statType) = pairs(1).split("::").toList match {
-        case x :: Nil => (x, StatType.Count)
-        case x :: xs => {
-          val statType = xs.head.toLowerCase() match {
-            case "count" => StatType.Count
-            case "value" => StatType.Value
-            case v => throw new Exception(s"Unknown stattype: $v")
-          }
-          (x, statType)
-        }
+    pairs match {
+      case topic :: Nil => Extractor(topic, StatType.Count, None)
+      case topic :: rest :: Nil =>
+        rest.split("::").toList match {
+        case property :: Nil => Extractor(topic, StatType.Count, Some(property))
+        case property :: "count" :: Nil => Extractor(topic, StatType.Count, Some(property))
+        case property :: "value" :: Nil => Extractor(topic, StatType.Value, Some(property))
+        case _ => throwInvalidExtractor()
       }
-      Extractor(pairs(0), statType, Option(property))
+      case _ => throwInvalidExtractor()
     }
   }
+
+  private def throwInvalidExtractor() = throw new Exception("Extractors must be in the format topic.property topic.property::count or topic.property::value")
 
 }
