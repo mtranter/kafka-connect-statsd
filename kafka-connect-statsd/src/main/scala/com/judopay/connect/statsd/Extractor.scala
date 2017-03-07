@@ -1,16 +1,25 @@
 package com.judopay.connect.statsd
 
+
+
 /**
   * Created by marktranter on 07/03/17.
   */
 case class Extractor(topic: String, statType: StatType, property: Option[String])
 
 object Extractor {
+
+  private val topicOnlyRegex = "(\\w+)".r
+  private val topicWithStat = "(\\w+)::(\\w+)".r
+  private val topicWithProperty = "^(\\w+).(\\w+)".r
+
   def apply(extractor: String): Extractor = {
 
-    val pairs = extractor.split('.').toList
+    extractor.split("::").toList match {
+      case topicValue
+    }
 
-    pairs match {
+      extractor.split('.').toList match {
       case topic :: Nil => Extractor(topic, StatType.Count, None)
       case topic :: rest :: Nil =>
         rest.split("::").toList match {
