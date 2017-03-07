@@ -8,6 +8,11 @@ object Common {
   val vsn = "1.0"
 
   def pimpedProject(id: String, path: String): Project = {
-    Dependencies(Resolvers(Project(id, file(path)))).settings(scalaVersion := scalaV).settings(version := vsn)
+    Dependencies(Resolvers(Project(id, file(path))))
+      .settings(scalaVersion := scalaV)
+      .settings(version := vsn)
+      .settings(Defaults.itSettings: _*)
+      .configs(IntegrationTest)
+
   }
 }
