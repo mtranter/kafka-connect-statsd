@@ -14,13 +14,24 @@ case class ExtractorConfig(topic: String, metric: SinkRecord => String, statType
 
 object ExtractorConfig {
 
-  def apply(topic: String, metric: SinkRecord => String, statType: StatType): ExtractorConfig = new ExtractorConfig(topic, metric, statType, None, None)
+  def apply(topic: String, metric: SinkRecord => String, statType: StatType): ExtractorConfig =
+    new ExtractorConfig(topic, metric, statType, None, None)
+
+  def apply(topic: String, metric: SinkRecord => String,
+            statType: StatType, field: SinkRecord => AnyRef): ExtractorConfig =
+    new ExtractorConfig(topic, metric, statType, Some(field), None)
+
+  def apply(
+             topic: String, metric: SinkRecord => String,
+             statType: StatType, field: SinkRecord => AnyRef,
+             predicate: SinkRecord => Boolean): ExtractorConfig =
+    new ExtractorConfig(topic, metric, statType, Some(field), Some(predicate))
 
   def parse(syntax: String): ExtractorConfig=  {
     val lexer = new ConnectorLexer(new ANTLRInputStream(syntax))
     val tokens = new CommonTokenStream(lexer)
     val parser = new ConnectorParser(tokens)
-    var config = ExtractorConfig("", sr => "", StatType.Count, None, None)
+    var config = ExtractorConfig("", sr => "", StatType.Count)
     var rhsCast: String => Object = identity
 
     parser.addErrorListener(new BaseErrorListener {

@@ -39,6 +39,7 @@ INT
    : ( '0' .. '9' )+
    ;
 
+
 DECIMAL
   : INT'.'INT
   ;
@@ -64,7 +65,7 @@ ID
    ;
 
 METRIC
-   : ( WORD | WORD '.'? )+
+   : ( WORD | '.' )+
    ;
 
 TOPICNAME

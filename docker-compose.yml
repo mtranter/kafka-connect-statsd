@@ -1,0 +1,91 @@
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    expose:
+      - "2181"
+    ports:
+      - "2181:2181"
+  kafka:
+    image: wurstmeister/kafka
+    expose:
+      - "9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+  schemaregistry:
+    ports:
+      - "8081:8081"
+    image: confluentinc/cp-schema-registry:3.1.1
+    environment:
+      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=zookeeper:2181
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081
+      - SCHEMA_REGISTRY_HOST_NAME=schemaregistry
+      - SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_METHODS=*
+      - SCHEMA_REGISTRY_ACCESS_CONTROL_ALLOW_ORIGIN=*
+  kafkaconnect:
+    image: judo/kafka-connect:3.1.1-8
+    environment:
+      - CONNECT_BOOTSTRAP_SERVERS=kafka:9092
+      - CONNECT_REST_ADVERTISED_HOST_NAME=kafkaconnect
+      - CONNECT_REST_PORT=8082
+      - CONNECT_GROUP_ID=judo-connect
+      - CONNECT_CONFIG_STORAGE_TOPIC=JudoConnectConfig
+      - CONNECT_OFFSET_STORAGE_TOPIC=JudoConnectOffsets
+      - CONNECT_STATUS_STORAGE_TOPIC=JudoConnectStatus
+      - CONNECT_KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schemaregistry:8081
+      - CONNECT_VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
+      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schemaregistry:8081
+      - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - CONNECT_INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+    expose:
+      - "8082"
+    ports:
+      - "8082:8082"
+    restart: always
+  kafkaconnectui:
+    image: landoop/kafka-connect-ui
+    environment:
+      - CONNECT_URL=http://kafkaconnect:8082
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafkaconnect
+  graphite-1:
+    image: hopsoft/graphite-statsd
+    expose:
+      # graphite web interface
+      - "80"
+      # statsd receiver
+      - "8125/udp"
+      # Grafana will connect to these
+      - "2003"
+      - "2004"
+      # carbon
+      - "2023"
+      - "2024"
+      # statsd admin port
+      #- "8126:8126"
+    restart: always
+    ports:
+      # graphite web interface
+      - "8001:80"
+      # statsd receiver
+      - "8125:8125/udp"
+  grafana:
+    image: grafana/grafana
+    expose:
+      # Web interface
+      - "3000"
+    ports:
+          # Web interface
+          - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    restart: always
+

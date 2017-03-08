@@ -57,7 +57,7 @@ template
 
 
 metric
-  : (METRIC|WORD)template?
+  : (METRIC|WORD)template?(METRIC|WORD)?
   ;
 
 topicname

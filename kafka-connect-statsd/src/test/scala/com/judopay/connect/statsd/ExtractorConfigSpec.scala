@@ -27,6 +27,15 @@ class ExtractorConfigSpec extends FlatSpec with Matchers{
     assert(cfg.metric(sr) === "judo.transactions.count.mozilla")
   }
 
+  "The ExtractorConfig parse method" should "parse a simple send stmt with fields and a complex templated metric" in {
+    val cfg = ExtractorConfig.parse("send count() of * from transactions to judo.transactions.${useragent}.count")
+    assert(cfg.topic === "transactions")
+    assert(cfg.statType === StatType.Count)
+    val sr = getSimpleSinkRecord("transactions","useragent","mozilla")
+    assert(cfg.field === None)
+    assert(cfg.metric(sr) === "judo.transactions.mozilla.count")
+  }
+
   "The ExtractorConfig parse method" should "parse a simple send stmt with value of fields" in {
     val cfg = ExtractorConfig.parse("send value() of statuscode from transactions to judo.transactions.count")
     assert(cfg.topic === "transactions")

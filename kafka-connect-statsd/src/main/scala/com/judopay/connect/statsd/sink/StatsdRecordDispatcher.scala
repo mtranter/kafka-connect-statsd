@@ -17,9 +17,9 @@ class StatsdRecordDispatcher(topicValueMap: Map[String,Array[ExtractorConfig]], 
             cfg.statType match {
               case StatType.Count => client.incrementCounter(statKey)
               case StatType.Value => value match {
-                case s:Some[java.lang.Short] => client.recordGauge(statKey,s.get.toLong)
-                case l:Some[java.lang.Long] => client.recordGauge(statKey,l.get)
-                case i:Some[java.lang.Integer] => client.recordGauge(statKey,i.get.toLong)
+                case Some(s) if s.isInstanceOf[java.lang.Short] => client.recordGauge(statKey,s.asInstanceOf[java.lang.Short].toLong)
+                case Some(i) if i.isInstanceOf[java.lang.Integer] => client.recordGauge(statKey,i.asInstanceOf[java.lang.Integer].toLong)
+                case Some(l) if l.isInstanceOf[java.lang.Long] => client.recordGauge(statKey,l.asInstanceOf[java.lang.Long])
                 case v:Any => throw new Exception(s"Stat type of ${v.getClass.getName} cannot be used as a StatType.Amount. Only shorts, ints & longs")
               }
             }

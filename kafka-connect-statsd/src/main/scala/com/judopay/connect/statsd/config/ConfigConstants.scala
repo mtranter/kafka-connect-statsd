@@ -22,12 +22,9 @@ object ConfigConstants {
   val STATSD_CONNECT_CONFIG_DISPLAY = "Statsd connection string"
 
   val EXTRACTORS_CONFIG_KEY = "statsd.value.extractors"
-  val EXTRACTORS_CONFIG_DOC = "Describes how to extract gauge values from a connector record. e.g. topic.property::count or topic.property::gauge"
+  val EXTRACTORS_CONFIG_DOC = "Describes how to extract gauge values from a connector record. e.g. send count() * from transactions where resultstatuscode = 5 to judopay.tranactions.blocked"
   val EXTRACTORS_CONFIG_DISPLAY = "Extractors"
 
-  val STATSD_METRIC_FORMAT_KEY = "statsd.metric.format"
-  val STATSD_METRIC_DOC = "The format to use to create statsd metric names"
-  val STATSD_METRIC_DISPLAY = "Metric Format"
 }
 
 object Configs {
@@ -38,9 +35,6 @@ object Configs {
       .define(STATSD_CONNECT_CONFIG_KEY, ConfigDef.Type.STRING, ConfigDef.NO_DEFAULT_VALUE,
         ConfigDef.Importance.HIGH, STATSD_CONNECT_CONFIG_DOC,STATSD_GROUP,1,
         ConfigDef.Width.LONG, STATSD_CONNECT_CONFIG_DISPLAY)
-    .define(STATSD_METRIC_FORMAT_KEY, ConfigDef.Type.STRING, "",
-      ConfigDef.Importance.MEDIUM, STATSD_METRIC_DOC,STATSD_GROUP,2,
-      ConfigDef.Width.LONG, STATSD_METRIC_DISPLAY)
     .define(EXTRACTORS_CONFIG_KEY, ConfigDef.Type.STRING, "",
       ConfigDef.Importance.MEDIUM, EXTRACTORS_CONFIG_DOC,STATSD_GROUP,3,
       ConfigDef.Width.LONG, EXTRACTORS_CONFIG_DISPLAY)
