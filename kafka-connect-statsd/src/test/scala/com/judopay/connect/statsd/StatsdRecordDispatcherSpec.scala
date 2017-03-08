@@ -1,6 +1,6 @@
 package com.judopay.connect.statsd
 
-import com.judopay.connect.statsd.config.ConfigConstants
+import com.judopay.connect.statsd.config.{ConfigConstants, ExtractorConfig}
 import com.judopay.connect.statsd.sink.StatsdRecordDispatcher
 import org.apache.kafka.common.config.Config
 import org.apache.kafka.connect.data.{Schema, SchemaBuilder, Struct}
@@ -21,8 +21,7 @@ class StatsdRecordDispatcherSpec extends FlatSpec with Matchers{
           ConfigConstants.PerTopic.statType -> StatType.Value.asInstanceOf[AnyRef],
           ConfigConstants.PerTopic.property -> "keyname".asInstanceOf[AnyRef])))
 
-    val connector = new StatsdRecordDispatcher(Map("topic" -> List(Extractor("topic", StatType.Value, Some("keyname"))).toArray),
-      new MockKeyNameGenerator("judo.topic.keyname"), mockStatsdClient)
+    val connector = new StatsdRecordDispatcher(Map("topic" -> List(ExtractorConfig("topic",s => "judo.topic.keyname", StatType.Value)).toArray), mockStatsdClient)
 
     val source = SchemaBuilder.struct()
       .version(2)
@@ -42,8 +41,7 @@ class StatsdRecordDispatcherSpec extends FlatSpec with Matchers{
 
     val mockStatsdClient = new MockStatsdClient()
 
-    val connector = new StatsdRecordDispatcher(Map("topic" -> List(Extractor("topic", StatType.Count, Some("keyname"))).toArray),
-      new MockKeyNameGenerator("judo.topic.keyname"), mockStatsdClient)
+    val connector = new StatsdRecordDispatcher(Map("topic" -> List(ExtractorConfig("topic", s => "judo.topic.keyname", StatType.Count)).toArray), mockStatsdClient)
 
     val source = SchemaBuilder.struct()
       .version(2)
@@ -59,51 +57,8 @@ class StatsdRecordDispatcherSpec extends FlatSpec with Matchers{
     assert(mockStatsdClient.increments("judo.topic.keyname") === 1)
   }
 
-  it should "send an increment message from sink record when no extractor is present" in {
 
-    val mockStatsdClient = new MockStatsdClient()
 
-    val connector = new StatsdRecordDispatcher(Map("topic" -> List().toArray),
-      new MockKeyNameGenerator("judo.topic"), mockStatsdClient)
-
-    val source = SchemaBuilder.struct()
-      .version(2)
-      .field("keyname", Schema.INT32_SCHEMA)
-      .build()
-
-    val sourceStruct = new Struct(source)
-    sourceStruct.put("keyname", 5)
-
-    connector.sendRecord(new SinkRecord("topic", 0, null, null, source, sourceStruct,5))
-
-    assert(mockStatsdClient.increments.contains("judo.topic"))
-    assert(mockStatsdClient.increments("judo.topic") === 1)
-  }
-
-  it should "send an increment message from sink record when no extractors are empty" in {
-
-    val mockStatsdClient = new MockStatsdClient()
-
-    val connector = new StatsdRecordDispatcher(Map(),
-      new MockKeyNameGenerator("judo.topic"), mockStatsdClient)
-
-    val source = SchemaBuilder.struct()
-      .version(2)
-      .field("keyname", Schema.INT32_SCHEMA)
-      .build()
-
-    val sourceStruct = new Struct(source)
-    sourceStruct.put("keyname", 5)
-
-    connector.sendRecord(new SinkRecord("topic", 0, null, null, source, sourceStruct,5))
-
-    assert(mockStatsdClient.increments.contains("judo.topic"))
-    assert(mockStatsdClient.increments("judo.topic") === 1)
-  }
-
-  class MockKeyNameGenerator(nameToReturn: String) extends StatNameGenerator {
-    override def generateStatName(topic: String, property: Option[String], value: Option[AnyRef]): String = nameToReturn
-  }
 
   class MockStatsdClient extends StatsdClient {
 

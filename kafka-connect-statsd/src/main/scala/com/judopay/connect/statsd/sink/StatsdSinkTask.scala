@@ -2,8 +2,8 @@ package com.judopay.connect.statsd.sink
 
 import java.util
 
-import com.judopay.connect.statsd.{Extractor, FormatStatNameGenerator, TimGroupStatsdClient}
-import com.judopay.connect.statsd.config.ConfigConstants
+import com.judopay.connect.statsd.{ TimGroupStatsdClient}
+import com.judopay.connect.statsd.config.{ConfigConstants, ExtractorConfig}
 import org.apache.kafka.clients.consumer.OffsetAndMetadata
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.connect.sink.{SinkRecord, SinkTask}
@@ -26,11 +26,11 @@ class StatsdSinkTask extends SinkTask {
   override def start(props: util.Map[String, String]): Unit = {
     val statsdClient = TimGroupStatsdClient(props.get(ConfigConstants.STATSD_CONNECT_CONFIG_KEY))
     val extractors = props.get(ConfigConstants.EXTRACTORS_CONFIG_KEY).split(',')
-      .map(s => Extractor(s.trim))
+      .map(s => ExtractorConfig.parse(s.trim))
       .groupBy(e => e.topic)
 
     statsdRecordDispatcher = Some(
-      new StatsdRecordDispatcher(extractors, new FormatStatNameGenerator(props.get(ConfigConstants.STATSD_METRIC_FORMAT_KEY)), statsdClient )
+      new StatsdRecordDispatcher(extractors, statsdClient )
     )
   }
 

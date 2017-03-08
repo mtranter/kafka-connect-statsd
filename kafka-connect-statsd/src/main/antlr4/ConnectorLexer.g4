@@ -8,11 +8,11 @@ SEND
    ;
 
 COUNT
-   : 'count' | 'COUNT'
+   : 'count()' | 'COUNT()'
    ;
 
 VALUE
-   : 'value' | 'VALUE'
+   : 'value()' | 'VALUE()'
    ;
 
 OF
@@ -31,26 +31,50 @@ WHERE
    : 'where' | 'WHERE'
    ;
 
+STRING
+   : '\''.*'\''
+   ;
+
+INT
+   : ( '0' .. '9' )+
+   ;
+
+DECIMAL
+  : INT'.'INT
+  ;
 
 EQUALS
    : '='
    ;
 
+START_TEMPLATE
+   : '${'
+   ;
 
-TOPICNAME
-   : ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9'| '.' | '-' | '+' | '/' )+
+END_TEMPLATE
+  : '}'
+  ;
+
+WORD
+   : ( 'a' .. 'z' | 'A' .. 'Z' )
+   ;
+
+ID
+   : ( WORD ( '0' .. '9' )? )+
    ;
 
 METRIC
-   : ( 'a' .. 'z' | 'A' .. 'Z' | '.' | '0' .. '9' )+
+   : ( WORD | WORD '.'? )+
    ;
 
-MESSAGES
-    : 'messages' | 'MESSAGES'
-    ;
+TOPICNAME
+   : ( METRIC | METRIC ( '-' | '+' | '/' | '_' )? )+
+   ;
 
-ID
-   : ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+
+
+
+ASTERISK
+   : '*'
    ;
 
 WS

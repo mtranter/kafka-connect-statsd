@@ -1,5 +1,4 @@
 // Generated from /home/marktranter/judo/kafka-connect-statsd/kafka-connect-statsd/src/main/antlr4/ConnectorParser.g4 by ANTLR 4.6
-package com.judopay.connect.statsd;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -28,18 +27,6 @@ public class ConnectorParserBaseListener implements ConnectorParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSend_with_where(ConnectorParser.Send_with_whereContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSend_with_where(ConnectorParser.Send_with_whereContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSend_basic(ConnectorParser.Send_basicContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -47,78 +34,6 @@ public class ConnectorParserBaseListener implements ConnectorParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSend_basic(ConnectorParser.Send_basicContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterSend_clause(ConnectorParser.Send_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSend_clause(ConnectorParser.Send_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterWhere_clause(ConnectorParser.Where_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitWhere_clause(ConnectorParser.Where_clauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterComparison(ConnectorParser.ComparisonContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitComparison(ConnectorParser.ComparisonContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterComp_op(ConnectorParser.Comp_opContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitComp_op(ConnectorParser.Comp_opContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLhs(ConnectorParser.LhsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLhs(ConnectorParser.LhsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterRhs(ConnectorParser.RhsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitRhs(ConnectorParser.RhsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -136,18 +51,6 @@ public class ConnectorParserBaseListener implements ConnectorParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSend_field(ConnectorParser.Send_fieldContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSend_field(ConnectorParser.Send_fieldContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterStattype(ConnectorParser.StattypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -160,13 +63,13 @@ public class ConnectorParserBaseListener implements ConnectorParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTemplate(ConnectorParser.TemplateContext ctx) { }
+	@Override public void enterTopicname(ConnectorParser.TopicnameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTemplate(ConnectorParser.TemplateContext ctx) { }
+	@Override public void exitTopicname(ConnectorParser.TopicnameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -184,13 +87,13 @@ public class ConnectorParserBaseListener implements ConnectorParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTopicname(ConnectorParser.TopicnameContext ctx) { }
+	@Override public void enterName(ConnectorParser.NameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTopicname(ConnectorParser.TopicnameContext ctx) { }
+	@Override public void exitName(ConnectorParser.NameContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
