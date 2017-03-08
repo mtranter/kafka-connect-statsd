@@ -3,6 +3,28 @@ parser grammar ConnectorParser;
 options
    { tokenVocab = ConnectorLexer; }
 
-send_count_basic
-   : SEND COUNT OF TOPICNAME TO METRIC
+stat
+   : send_basic
+   ;
+
+
+send_basic
+   : SEND stattype OF field FROM topicname TO metric
+   ;
+
+
+field
+   : MESSAGES|ID
+   ;
+
+stattype
+   : COUNT | VALUE
+   ;
+
+topicname
+   : TOPICNAME
+   ;
+
+metric
+   : METRIC
    ;

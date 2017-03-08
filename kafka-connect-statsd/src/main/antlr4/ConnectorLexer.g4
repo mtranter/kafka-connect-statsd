@@ -11,6 +11,10 @@ COUNT
    : 'count' | 'COUNT'
    ;
 
+VALUE
+   : 'value' | 'VALUE'
+   ;
+
 OF
    : 'of' | 'OF'
    ;
@@ -32,6 +36,7 @@ EQUALS
    : '='
    ;
 
+
 TOPICNAME
    : ( 'a' .. 'z' | 'A' .. 'Z' | '_' | '0' .. '9'| '.' | '-' | '+' | '/' )+
    ;
@@ -39,3 +44,15 @@ TOPICNAME
 METRIC
    : ( 'a' .. 'z' | 'A' .. 'Z' | '.' | '0' .. '9' )+
    ;
+
+MESSAGES
+    : 'messages' | 'MESSAGES'
+    ;
+
+ID
+   : ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )+
+   ;
+
+WS
+  : ( ' ' | '\t' | '\n' | '\r' )+ -> skip
+  ;

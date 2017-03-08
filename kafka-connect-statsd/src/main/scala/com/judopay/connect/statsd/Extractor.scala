@@ -15,10 +15,6 @@ object Extractor {
 
   def apply(extractor: String): Extractor = {
 
-    extractor.split("::").toList match {
-      case topicValue
-    }
-
       extractor.split('.').toList match {
       case topic :: Nil => Extractor(topic, StatType.Count, None)
       case topic :: rest :: Nil =>
