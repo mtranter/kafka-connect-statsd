@@ -17,3 +17,9 @@ topics=statsd.statsdtest
 tasks.max=1
 statsd.value.extractors=send count() of * from statsd.statsdtest to judopay.transactions.count,send count() of * from stats.statsdtest where resultstatuscode = 5 to judopay.blockedtransactions.count
 name=StatsdSinkConnector
+
+
+
+
+send count() of * from ApiRequestLogs to judopay.apirequestlogs.useragent.${UserAgent}.count
+send count() of * from ApiRequestLogs to judopay.apirequestlogs.apiapplication.${ApiApplicationRecId}.count

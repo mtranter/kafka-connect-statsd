@@ -41,7 +41,7 @@ class ExtractorConfigSpec extends FlatSpec with Matchers{
     assert(cfg.topic === "transactions")
     assert(cfg.statType === StatType.Value)
     val sr = getSimpleSinkRecord()
-    assert(cfg.field.get(sr) === "STATUS")
+    assert(cfg.field.get === "statuscode")
     assert(cfg.metric(sr) === "judo.transactions.count")
   }
 
@@ -51,7 +51,7 @@ class ExtractorConfigSpec extends FlatSpec with Matchers{
     assert(cfg.statType === StatType.Count)
 
     val sr = getSimpleSinkRecord()
-    assert(cfg.predicate.get(sr))
+    assert(cfg.predicate(sr))
     assert(cfg.metric(sr) === "judo.transactions.count")
   }
 
@@ -69,7 +69,24 @@ class ExtractorConfigSpec extends FlatSpec with Matchers{
     sourceStruct.put("statuscode", 5)
 
 
-    assert(cfg.predicate.get(new SinkRecord("transactions",0,source,null, null, sourceStruct, 0)))
+    assert(cfg.predicate(new SinkRecord("transactions",0,source,null, null, sourceStruct, 0)))
+  }
+
+  "The ExtractorConfig parse method" should "parse a send stmt with fields and a double where clause" in {
+    val cfg = ExtractorConfig.parse("send count() of value from transactions  where statuscode = 5.5 to judo.transactions.count")
+    assert(cfg.topic === "transactions")
+    assert(cfg.statType === StatType.Count)
+
+    val source = SchemaBuilder.struct()
+      .version(2)
+      .field("statuscode", Schema.FLOAT64_SCHEMA)
+      .build()
+
+    val sourceStruct = new Struct(source)
+    sourceStruct.put("statuscode", 5.5)
+
+
+    assert(cfg.predicate(new SinkRecord("transactions",0,source,null, null, sourceStruct, 0)))
   }
 
   "The ExtractorConfig parse method" should "parse a send stmt with fields and a string not where clause" in {
@@ -87,7 +104,7 @@ class ExtractorConfigSpec extends FlatSpec with Matchers{
     sourceStruct.put("statuscode", "STATUS")
 
 
-    assert(!cfg.predicate.get(new SinkRecord("transactions",0,source,null, null, sourceStruct, 0)))
+    assert(!cfg.predicate(new SinkRecord("transactions",0,source,null, null, sourceStruct, 0)))
   }
 
   private def getSimpleSinkRecord(topic: String = "transactions", key: String = "statuscode", value: String = "STATUS") = {

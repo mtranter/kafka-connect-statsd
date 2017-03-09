@@ -21,7 +21,7 @@ class StatsdRecordDispatcherSpec extends FlatSpec with Matchers{
           ConfigConstants.PerTopic.statType -> StatType.Value.asInstanceOf[AnyRef],
           ConfigConstants.PerTopic.property -> "keyname".asInstanceOf[AnyRef])))
 
-    val connector = new StatsdRecordDispatcher(Map("topic" -> List(ExtractorConfig("topic",s => "judo.topic.keyname", StatType.Value, s => 5.asInstanceOf[AnyRef])).toArray), mockStatsdClient)
+    val connector = new StatsdRecordDispatcher(Map("topic" -> List(ExtractorConfig("topic",(s: SinkRecord) => "judo.topic.keyname", StatType.Value, "keyname")).toArray), mockStatsdClient)
 
     val source = SchemaBuilder.struct()
       .version(2)
@@ -41,7 +41,7 @@ class StatsdRecordDispatcherSpec extends FlatSpec with Matchers{
 
     val mockStatsdClient = new MockStatsdClient()
 
-    val connector = new StatsdRecordDispatcher(Map("topic" -> List(ExtractorConfig("topic", s => "judo.topic.keyname", StatType.Count, s => 5.asInstanceOf[AnyRef])).toArray), mockStatsdClient)
+    val connector = new StatsdRecordDispatcher(Map("topic" -> List(ExtractorConfig("topic",(s: SinkRecord) => "judo.topic.keyname", StatType.Count, "keyname")).toArray), mockStatsdClient)
 
     val source = SchemaBuilder.struct()
       .version(2)
@@ -56,9 +56,6 @@ class StatsdRecordDispatcherSpec extends FlatSpec with Matchers{
     assert(mockStatsdClient.increments.contains("judo.topic.keyname"))
     assert(mockStatsdClient.increments("judo.topic.keyname") === 1)
   }
-
-
-
 
   class MockStatsdClient extends StatsdClient {
 

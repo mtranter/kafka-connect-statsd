@@ -10,29 +10,52 @@ import org.apache.kafka.connect.sink.SinkRecord
   * Created by mark on 08/03/17.
   */
 
-case class ExtractorConfig(topic: String, metric: SinkRecord => String, statType: StatType, field: Option[SinkRecord => AnyRef], predicate: Option[SinkRecord => Boolean])
+abstract class BinaryComparisonOp {
+  def apply(a: AnyRef, b: AnyRef): Boolean
+}
+object EqualsComparisonOp extends BinaryComparisonOp{
+  override def apply(a: AnyRef, b: AnyRef): Boolean = a == b
+}
+abstract class SinkRecordPredicate {
+  def apply(sr: SinkRecord): Boolean
+}
+object TrueSinkRecordPredicate extends SinkRecordPredicate {
+  override def apply(sr: SinkRecord): Boolean = true
+}
+case class StructFieldPredicate(field: Option[String], rhs: AnyRef, op: BinaryComparisonOp) extends SinkRecordPredicate {
+  def apply(sr: SinkRecord) = field match {
+    case None => sr.value() == rhs
+    case Some(f) => {
+      val field = f
+      sr.value().asInstanceOf[Struct].get(field).equals(rhs)
+    }
+  }
+}
+
+
+case class ExtractorConfig(topic: String, metric: SinkRecord => String, statType: StatType, field: Option[String], predicate: SinkRecordPredicate = TrueSinkRecordPredicate)
 
 object ExtractorConfig {
 
   def apply(topic: String, metric: SinkRecord => String, statType: StatType): ExtractorConfig =
-    new ExtractorConfig(topic, metric, statType, None, None)
+    new ExtractorConfig(topic, metric, statType, None, TrueSinkRecordPredicate)
 
   def apply(topic: String, metric: SinkRecord => String,
-            statType: StatType, field: SinkRecord => AnyRef): ExtractorConfig =
-    new ExtractorConfig(topic, metric, statType, Some(field), None)
+            statType: StatType, field: String): ExtractorConfig =
+    new ExtractorConfig(topic, metric, statType, Some(field), TrueSinkRecordPredicate)
 
   def apply(
              topic: String, metric: SinkRecord => String,
-             statType: StatType, field: SinkRecord => AnyRef,
-             predicate: SinkRecord => Boolean): ExtractorConfig =
-    new ExtractorConfig(topic, metric, statType, Some(field), Some(predicate))
+             statType: StatType, field: String,
+             predicate: SinkRecordPredicate): ExtractorConfig =
+    new ExtractorConfig(topic, metric, statType, Some(field), predicate)
 
   def parse(syntax: String): ExtractorConfig=  {
     val lexer = new ConnectorLexer(new ANTLRInputStream(syntax))
     val tokens = new CommonTokenStream(lexer)
     val parser = new ConnectorParser(tokens)
     var config = ExtractorConfig("", sr => "", StatType.Count)
-    var rhsCast: String => Object = identity
+    var nextRhs: Option[AnyRef] = None
 
     parser.addErrorListener(new BaseErrorListener {
       override def syntaxError(recognizer: Recognizer[_, _],
@@ -62,7 +85,11 @@ object ExtractorConfig {
         val metricTempalte = ctx.template()
         if(metricTempalte != null){
           val metricField = metricTempalte.field().getText
-          config = config.copy(metric = sr => metric.replace("${" + metricField + "}",sr.value().asInstanceOf[Struct].get(metricField).toString))
+          config = config.copy(metric = sr => {
+            val value = sr.value().asInstanceOf[Struct].get(metricField)
+            val metricToReplaceWith = if(value == null) "null" else value.toString
+            metric.replace("${" + metricField + "}", metricToReplaceWith)
+          })
         }else {
           config = config.copy(metric = sr => metric)
         }
@@ -70,20 +97,23 @@ object ExtractorConfig {
 
       override def exitSend_field(ctx: ConnectorParser.Send_fieldContext) = {
         if(ctx.getText != "*"){
-          config = config.copy(field = Some(sr => sr.value().asInstanceOf[Struct].get(ctx.getText)))
+          config = config.copy(field = Some(ctx.getText))
         }
       }
 
       override def exitComparison(ctx: ComparisonContext): Unit = {
         val lhs = ctx.lhs().getText
-        val rhs = ctx.rhs().getText
-        config = config.copy(predicate = Some(sr => sr.value().asInstanceOf[Struct].get(lhs) == rhsCast(rhs)))
+        config = nextRhs match {
+          case Some(s) =>  config.copy(predicate = StructFieldPredicate(Some(lhs),s,EqualsComparisonOp))
+          case None => throw new Exception("Unable to parse rhs of comparison expression " + ctx.getText)
+        }
+        nextRhs = None
       }
 
       override def exitRhs(ctx: RhsContext): Unit = {
-        if(ctx.DECIMAL() != null) rhsCast = o => o.toDouble.asInstanceOf[Object]
-        if(ctx.INT() != null) rhsCast = o => o.toInt.asInstanceOf[Object]
-        if(ctx.STRING() != null) rhsCast = o => o.replaceAll("'","").asInstanceOf[Object]
+        if(ctx.DECIMAL() != null) nextRhs = Some(ctx.getText.toDouble.asInstanceOf[AnyRef])
+        else if(ctx.INT() != null) nextRhs = Some(ctx.getText.toInt.asInstanceOf[AnyRef])
+        else if(ctx.STRING() != null) nextRhs = Some(ctx.getText.replaceAll("'","").asInstanceOf[AnyRef])
       }
 
     })
