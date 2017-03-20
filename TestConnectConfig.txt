@@ -1,0 +1,20 @@
+connector.class=io.confluent.connect.jdbc.JdbcSourceConnector
+mode=incrementing
+incrementing.column.name=receiptidentifier
+topic.prefix=statsd.
+tasks.max=2
+poll.interval.ms=5000
+name=statsd-test
+batch.max.rows=5000
+connection.url=jdbc:sqlserver://192.168.43.178:1433;databaseName=JudoPayments_BI;user=sqlconnect;password=m6n2b2bCPinNzwh;selectMethod=cursor;
+table.types=VIEW
+table.whitelist=statsdtest
+
+
+connector.class=com.judopay.connect.statsd.StatsdSinkConnector
+statsd.connect=graphite-1:8125
+topics=statsd.statsdtest
+tasks.max=1
+statsd.value.extractors=send count() of * from statsd.statsdtest to judopay.transactions.count,send count() of * from stats.statsdtest where resultstatuscode = 5 to judopay.blockedtransactions.count
+name=StatsdSinkConnector
+
