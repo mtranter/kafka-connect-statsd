@@ -1,0 +1,17 @@
+resources:
+  - name: source
+    type: git
+    source:
+      uri: https://github.com/Judopay/RiskMonitoring.git
+      branch: develop
+      username: judoteamcity
+      password: b8x6BabmnRAa9Rp5kEhc
+jobs:
+  - name: build & test
+    plan:
+      - get: source
+      - aggregate:
+        - task: build
+          file: source/ci/build.yml
+        - task: test
+          file: source/ci/test.yml

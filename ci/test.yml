@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: judo/sbt
+    tag: "13.8"
+inputs:
+  - name: source
+
+run:
+  path: sbt
+  dir: source
+  args: ["test"]
